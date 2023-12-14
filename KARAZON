@@ -1,0 +1,106 @@
+#include<iostream>
+#include<iomanip>
+
+using namespace std;
+
+// Function to calculate GST
+double calculateGST(double subtotal) {
+    const double GST_RATE = 0.18; // 18% GST
+    return subtotal * GST_RATE;
+}
+
+int main() {
+    int itemCode, qty;
+    double price, grandTotal = 0.0;
+    char memberType, paymentMode;
+
+    // Input for member type
+    cout << "Are you a member of Karazon? (Y/N): ";
+    cin >> memberType;
+
+    // Loop to add items to the cart
+    while (true) {
+        // Input for item details
+        cout << "\nEnter Item Code (0 to exit): ";
+        cin >> itemCode;
+
+        if (itemCode == 0) {
+            // Exit the loop when itemCode is 0
+            break;
+        }
+
+        cout << "Enter Item Description: ";
+        string description;
+        cin.ignore(); // Ignore the newline character left by previous input
+        getline(cin, description);
+
+        cout << "Enter Quantity: ";
+        cin >> qty;
+
+        cout << "Enter Price per Item: Rs. ";
+        cin >> price;
+
+        // Calculate total for the item
+        double total = qty * price;
+
+        // Apply member discount if applicable
+        if (memberType == 'Y' || memberType == 'y') {
+            char cardType;
+            cout << "Enter Card Type (S for Silver, G for Gold, P for Platinum): ";
+            cin >> cardType;
+
+            double discount = 0.0;
+            switch (cardType) {
+                case 'S':
+                case 's':
+                    discount = 0.05; // 5% discount for Silver
+                    break;
+                case 'G':
+                case 'g':
+                    discount = 0.10; // 10% discount for Gold
+                    break;
+                case 'P':
+                case 'p':
+                    discount = 0.15; // 15% discount for Platinum
+                    break;
+                default:
+                    cout << "Invalid card type. No additional discount applied." << endl;
+            }
+
+            total -= total * discount;
+        }
+
+        // Calculate GST
+        double gst = calculateGST(total);
+
+        // Add GST to the total
+        total += gst;
+
+        // Add item total to the grand total
+        grandTotal += total;
+    }
+
+    // Apply platform fee
+    double platformFee = grandTotal * 0.002;
+    grandTotal += platformFee;
+
+    // Apply surcharge or convenience fee based on the grand total and payment mode
+    if (grandTotal < 1000) {
+        cout << "Choose Payment Mode (C for Card, O for Other): ";
+        cin >> paymentMode;
+
+        if (paymentMode == 'C' || paymentMode == 'c') {
+            // Surcharge of 2.5% for card payment if grand total is less than Rs. 1,000/-
+            grandTotal += grandTotal * 0.025;
+        } else {
+            // Convenience fee of 1% for other payment modes
+            grandTotal += grandTotal * 0.01;
+        }
+    }
+
+    // Display the final invoice total
+    cout << fixed << setprecision(2);
+    cout << "\nGrand Total (including all charges): Rs. " << grandTotal << endl;
+
+    return 0;
+}
